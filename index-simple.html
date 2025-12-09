@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Prediction Platform</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            text-align: center;
+            color: #4a5568;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            text-align: center;
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+        }
+
+        .status {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .wallet-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Privacy Prediction Platform</h1>
+            <p>Make confidential predictions using blockchain technology</p>
+        </div>
+
+        <div id="statusMessage" class="status hidden"></div>
+
+        <!-- Wallet Connection -->
+        <div class="card">
+            <h2>💰 Wallet Connection</h2>
+            <div id="walletSection">
+                <button id="connectWallet" class="btn">Connect MetaMask Wallet</button>
+                <div id="walletInfo" class="hidden">
+                    <div class="wallet-info">
+                        <span><strong>Address:</strong> <span id="walletAddress"></span></span>
+                        <span><strong>Network:</strong> <span id="networkName">Sepolia</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contract Status -->
+        <div class="card">
+            <h2>📊 Contract Status</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalEvents">0</div>
+                    <div>Total Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="contractStatus">Checking...</div>
+                    <div>Contract Status</div>
+                </div>
+            </div>
+            <p><strong>Contract Address:</strong> 0x86EB37C3DC77925812451258e4a7fb63092BB60B</p>
+        </div>
+
+        <!-- Owner Section -->
+        <div id="ownerSection" class="card hidden">
+            <h2>⚙️ Owner Panel</h2>
+            <p class="success">✅ You are the contract owner!</p>
+
+            <div class="form-group">
+                <label for="eventTitle">Event Title:</label>
+                <input type="text" id="eventTitle" placeholder="Enter event title">
+            </div>
+
+            <div class="form-group">
+                <label for="eventDescription">Event Description:</label>
+                <textarea id="eventDescription" placeholder="Enter event description" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="eventDuration">Duration (hours):</label>
+                <input type="number" id="eventDuration" value="168" min="1">
+            </div>
+
+            <button id="createEventBtn" class="btn">🎯 Create Prediction Event</button>
+
+            <hr style="margin: 20px 0;">
+
+            <button id="createDefaultEvents" class="btn btn-secondary">🚀 Create 3 Default Events</button>
+        </div>
+
+        <!-- User Prediction Section -->
+        <div id="userSection" class="card">
+            <h2>🎯 Make Prediction</h2>
+
+            <div class="form-group">
+                <label for="predictionEventId">Select Event:</label>
+                <select id="predictionEventId">
+                    <option value="">Select an event to predict</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="predictionValue">Your Prediction:</label>
+                <select id="predictionValue">
+                    <option value="true">Yes / True</option>
+                    <option value="false">No / False</option>
+                </select>
+            </div>
+
+            <button id="makePredictionBtn" class="btn">🔮 Submit Confidential Prediction</button>
+        </div>
+
+        <!-- Finalize Section -->
+        <div id="finalizeSection" class="card hidden">
+            <h2>🎯 Finalize Events</h2>
+
+            <div class="form-group">
+                <label for="finalizeEventId">Select Event to Finalize:</label>
+                <select id="finalizeEventId">
+                    <option value="">Select an event</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="actualOutcome">Actual Result:</label>
+                <select id="actualOutcome">
+                    <option value="true">Yes / True</option>
+                    <option value="false">No / False</option>
+                </select>
+            </div>
+
+            <button id="finalizeEventBtn" class="btn btn-secondary">🎯 Finalize Event</button>
+        </div>
+    </div>
+
+    <script>
+        const CONTRACT_ADDRESS = "0x86EB37C3DC77925812451258e4a7fb63092BB60B";
+        const SEPOLIA_CHAIN_ID = "0xaa36a7";
+        const SEPOLIA_RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
+
+        const CONTRACT_ABI = [
+            "function owner() view returns (address)",
+            "function getTotalEvents() view returns (uint256)",
+            "function createEvent(string title, string description, uint256 duration) returns (uint256)",
+            "function makePrediction(uint256 eventId, bool prediction)",
+            "function finalizeEvent(uint256 eventId, bool actualOutcome)",
+            "function getEvent(uint256 eventId) view returns (tuple(string title, string description, uint256 endTime, bool isFinalized, bool actualOutcome, uint256 totalPredictions, address creator, bool isActive, address[] predictors))",
+            "function getUserPrediction(uint256 eventId, address user) view returns (bool hasPredicted, uint256 timestamp, bool isRevealed)",
+            "function isPredictionTimeActive(uint256 eventId) view returns (bool)",
+            "event EventCreated(uint256 indexed eventId, string title, uint256 endTime, address indexed creator)",
+            "event PredictionMade(uint256 indexed eventId, address indexed predictor, uint256 timestamp)",
+            "event EventFinalized(uint256 indexed eventId, bool outcome, uint256 totalPredictions)"
+        ];
+
+        let provider, signer, contract, userAddress, isOwner = false;
+
+        // DOM elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const walletInfo = document.getElementById('walletInfo');
+        const walletAddress = document.getElementById('walletAddress');
+        const statusMessage = document.getElementById('statusMessage');
+        const ownerSection = document.getElementById('ownerSection');
+        const finalizeSection = document.getElementById('finalizeSection');
+        const totalEventsSpan = document.getElementById('totalEvents');
+        const contractStatus = document.getElementById('contractStatus');
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status ${type}`;
+            statusMessage.classList.remove('hidden');
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    showStatus('Please install MetaMask!', 'error');
+                    return;
+                }
+
+                const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
+                const chainId = await window.ethereum.request({method: 'eth_chainId'});
+
+                if (chainId !== SEPOLIA_CHAIN_ID) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: SEPOLIA_CHAIN_ID }],
+                        });
+                    } catch (error) {
+                        showStatus('Please switch to Sepolia testnet', 'error');
+                        return;
+                    }
+                }
+
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                userAddress = accounts[0];
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                walletAddress.textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(38)}`;
+                connectWalletBtn.classList.add('hidden');
+                walletInfo.classList.remove('hidden');
+
+                await checkOwnerStatus();
+                await updateContractStatus();
+                await loadEventOptions();
+
+                showStatus('✅ Wallet connected successfully!', 'success');
+
+            } catch (error) {
+                showStatus('Failed to connect wallet: ' + error.message, 'error');
+            }
+        }
+
+        async function checkOwnerStatus() {
+            try {
+                const owner = await contract.owner();
+                isOwner = userAddress.toLowerCase() === owner.toLowerCase();
+
+                if (isOwner) {
+                    ownerSection.classList.remove('hidden');
+                    finalizeSection.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Failed to check owner status:', error);
+            }
+        }
+
+        async function updateContractStatus() {
+            try {
+                const total = await contract.getTotalEvents();
+                totalEventsSpan.textContent = total.toString();
+                contractStatus.textContent = total > 0 ? 'Active' : 'No Events';
+            } catch (error) {
+                contractStatus.textContent = 'Error';
+                console.error('Failed to get contract status:', error);
+            }
+        }
+
+        async function loadEventOptions() {
+            try {
+                const total = await contract.getTotalEvents();
+                const predictionSelect = document.getElementById('predictionEventId');
+                const finalizeSelect = document.getElementById('finalizeEventId');
+
+                predictionSelect.innerHTML = '<option value="">Select an event to predict</option>';
+                finalizeSelect.innerHTML = '<option value="">Select an event</option>';
+
+                for (let i = 0; i < total; i++) {
+                    try {
+                        const event = await contract.getEvent(i);
+                        const title = event[0];
+                        const isFinalized = event[3];
+                        const isActive = await contract.isPredictionTimeActive(i);
+
+                        // Add to prediction dropdown if active
+                        if (isActive) {
+                            const option = document.createElement('option');
+                            option.value = i;
+                            option.textContent = `Event ${i}: ${title}`;
+                            predictionSelect.appendChild(option);
+                        }
+
+                        // Add to finalize dropdown if ended but not finalized
+                        if (!isFinalized && !isActive) {
+                            const option = document.createElement('option');
+                            option.value = i;
+                            option.textContent = `Event ${i}: ${title}`;
+                            finalizeSelect.appendChild(option);
+                        }
+                    } catch (error) {
+                        console.error(`Error loading event ${i}:`, error);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load event options:', error);
+            }
+        }
+
+        async function createEvent() {
+            const title = document.getElementById('eventTitle').value;
+            const description = document.getElementById('eventDescription').value;
+            const duration = document.getElementById('eventDuration').value;
+
+            if (!title || !description || !duration) {
+                showStatus('Please fill in all fields!', 'error');
+                return;
+            }
+
+            try {
+                const durationInSeconds = parseInt(duration) * 60 * 60;
+                const tx = await contract.createEvent(title, description, durationInSeconds);
+
+                showStatus('Creating event...', 'info');
+                const receipt = await tx.wait();
+
+                showStatus(`✅ Event created successfully! Block: ${receipt.blockNumber}`, 'success');
+
+                // Clear form
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventDescription').value = '';
+                document.getElementById('eventDuration').value = '168';
+
+                await updateContractStatus();
+                await loadEventOptions();
+
+            } catch (error) {
+                showStatus('Failed to create event: ' + error.message, 'error');
+            }
+        }
+
+        async function createDefaultEvents() {
+            const defaultEvents = [
+                {
+                    title: "🏆 2026 FIFA World Cup Winner Prediction",
+                    description: "Predict which team will win the 2026 FIFA World Cup!",
+                    duration: 90 * 24 * 60 * 60
+                },
+                {
+                    title: "💎 Bitcoin $100K Breakthrough Prediction",
+                    description: "Will Bitcoin break through $100,000 by the end of 2024?",
+                    duration: 60 * 24 * 60 * 60
+                },
+                {
+                    title: "🎮 Gaming Championship Prediction",
+                    description: "Predict the outcome of major esports championships.",
+                    duration: 30 * 24 * 60 * 60
+                }
+            ];
+
+            try {
+                showStatus('Creating default events...', 'info');
+
+                for (let i = 0; i < defaultEvents.length; i++) {
+                    const event = defaultEvents[i];
+                    const tx = await contract.createEvent(event.title, event.description, event.duration);
+                    await tx.wait();
+                }
+
+                showStatus('✅ All default events created successfully!', 'success');
+                await updateContractStatus();
+                await loadEventOptions();
+
+            } catch (error) {
+                showStatus('Failed to create default events: ' + error.message, 'error');
+            }
+        }
+
+        async function makePrediction() {
+            const eventId = document.getElementById('predictionEventId').value;
+            const prediction = document.getElementById('predictionValue').value === 'true';
+
+            if (!eventId) {
+                showStatus('Please select an event!', 'error');
+                return;
+            }
+
+            try {
+                const tx = await contract.makePrediction(parseInt(eventId), prediction);
+
+                showStatus('Submitting prediction...', 'info');
+                const receipt = await tx.wait();
+
+                showStatus(`✅ Prediction submitted successfully! Gas: ${receipt.gasUsed.toString()}`, 'success');
+
+            } catch (error) {
+                showStatus('Failed to make prediction: ' + error.message, 'error');
+            }
+        }
+
+        async function finalizeEvent() {
+            const eventId = document.getElementById('finalizeEventId').value;
+            const outcome = document.getElementById('actualOutcome').value === 'true';
+
+            if (!eventId) {
+                showStatus('Please select an event!', 'error');
+                return;
+            }
+
+            try {
+                const tx = await contract.finalizeEvent(parseInt(eventId), outcome);
+
+                showStatus('Finalizing event...', 'info');
+                const receipt = await tx.wait();
+
+                showStatus(`✅ Event finalized successfully! Block: ${receipt.blockNumber}`, 'success');
+                await loadEventOptions();
+
+            } catch (error) {
+                showStatus('Failed to finalize event: ' + error.message, 'error');
+            }
+        }
+
+        // Event listeners
+        connectWalletBtn.addEventListener('click', connectWallet);
+        document.getElementById('createEventBtn').addEventListener('click', createEvent);
+        document.getElementById('createDefaultEvents').addEventListener('click', createDefaultEvents);
+        document.getElementById('makePredictionBtn').addEventListener('click', makePrediction);
+        document.getElementById('finalizeEventBtn').addEventListener('click', finalizeEvent);
+
+        // Initialize
+        updateContractStatus();
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+import { FHE, euint8, ebool } from "@fhevm/solidity/lib/FHE.sol";
+import { SepoliaConfig } from "@fhevm/solidity/config/ZamaConfig.sol";
+
+contract PrivacyPredictionPlatform is SepoliaConfig {
+    
+    address public owner;
+    uint256 public nextEventId;
+    uint256 public totalEvents;
+
+    // Platform constants
+    uint256 constant MAX_EVENT_DURATION = 90 days;
+    uint256 constant MIN_PREDICTION_TIME = 1 hours;
+    
+    struct ConfidentialPrediction {
+        euint8 encryptedPrediction;
+        bool hasPredicted;
+        uint256 timestamp;
+        bool isRevealed;
+    }
+    
+    struct PredictionEvent {
+        string title;
+        string description;
+        uint256 endTime;
+        bool isFinalized;
+        bool actualOutcome;
+        uint256 totalPredictions;
+        address creator;
+        bool isActive;
+        address[] predictors;
+    }
+    
+    mapping(uint256 => PredictionEvent) public events;
+    mapping(uint256 => mapping(address => ConfidentialPrediction)) public predictions;
+    
+    event EventCreated(uint256 indexed eventId, string title, uint256 endTime, address indexed creator);
+    event PredictionMade(uint256 indexed eventId, address indexed predictor, uint256 timestamp);
+    event EventFinalized(uint256 indexed eventId, bool outcome, uint256 totalPredictions);
+    event ResultRevealed(uint256 indexed eventId, address indexed predictor, bool prediction, bool correct);
+    
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not authorized");
+        _;
+    }
+    
+    modifier eventExists(uint256 _eventId) {
+        require(_eventId < nextEventId, "Event does not exist");
+        _;
+    }
+
+    modifier eventActive(uint256 _eventId) {
+        require(events[_eventId].isActive, "Event is not active");
+        require(!events[_eventId].isFinalized, "Event is finalized");
+        require(block.timestamp < events[_eventId].endTime, "Event has ended");
+        _;
+    }
+    
+    constructor() {
+        owner = msg.sender;
+        nextEventId = 0;
+        totalEvents = 0;
+    }
+    
+    // Create a new prediction event
+    function createEvent(
+        string memory _title,
+        string memory _description,
+        uint256 _duration
+    ) external onlyOwner returns (uint256) {
+        require(bytes(_title).length > 0, "Title cannot be empty");
+        require(_duration >= MIN_PREDICTION_TIME && _duration <= MAX_EVENT_DURATION, "Invalid duration");
+
+        uint256 eventId = nextEventId++;
+
+        events[eventId] = PredictionEvent({
+            title: _title,
+            description: _description,
+            endTime: block.timestamp + _duration,
+            isFinalized: false,
+            actualOutcome: false,
+            totalPredictions: 0,
+            creator: msg.sender,
+            isActive: true,
+            predictors: new address[](0)
+        });
+
+        totalEvents++;
+        emit EventCreated(eventId, _title, events[eventId].endTime, msg.sender);
+        return eventId;
+    }
+    
+    // Make a confidential prediction
+    function makePrediction(uint256 _eventId, bool _prediction)
+        external
+        eventExists(_eventId)
+        eventActive(_eventId)
+    {
+        require(!predictions[_eventId][msg.sender].hasPredicted, "Already made prediction");
+
+        // Encrypt the prediction using FHE
+        euint8 encryptedPrediction = FHE.asEuint8(_prediction ? 1 : 0);
+
+        predictions[_eventId][msg.sender] = ConfidentialPrediction({
+            encryptedPrediction: encryptedPrediction,
+            hasPredicted: true,
+            timestamp: block.timestamp,
+            isRevealed: false
+        });
+
+        events[_eventId].predictors.push(msg.sender);
+        events[_eventId].totalPredictions++;
+
+        // Set FHE permissions
+        FHE.allowThis(encryptedPrediction);
+        FHE.allow(encryptedPrediction, msg.sender);
+
+        emit PredictionMade(_eventId, msg.sender, block.timestamp);
+    }
+    
+    // Finalize an event with the actual outcome
+    function finalizeEvent(uint256 _eventId, bool _actualOutcome)
+        external
+        onlyOwner
+        eventExists(_eventId)
+    {
+        require(block.timestamp >= events[_eventId].endTime, "Event has not ended yet");
+        require(!events[_eventId].isFinalized, "Event already finalized");
+
+        events[_eventId].isFinalized = true;
+        events[_eventId].actualOutcome = _actualOutcome;
+        events[_eventId].isActive = false;
+
+        emit EventFinalized(_eventId, _actualOutcome, events[_eventId].totalPredictions);
+    }
+    
+    // Reveal prediction result (after event is finalized)
+    function revealPrediction(uint256 _eventId, bool _revealedPrediction)
+        external
+        eventExists(_eventId)
+        returns (bool)
+    {
+        require(events[_eventId].isFinalized, "Event not finalized yet");
+        require(predictions[_eventId][msg.sender].hasPredicted, "No prediction made");
+        require(!predictions[_eventId][msg.sender].isRevealed, "Already revealed");
+
+        predictions[_eventId][msg.sender].isRevealed = true;
+        bool isCorrect = (_revealedPrediction == events[_eventId].actualOutcome);
+
+        emit ResultRevealed(_eventId, msg.sender, _revealedPrediction, isCorrect);
+        return isCorrect;
+    }
+    
+    // Get event details
+    function getEvent(uint256 _eventId) external view eventExists(_eventId) returns (PredictionEvent memory) {
+        return events[_eventId];
+    }
+    
+    // Get prediction status for a user
+    function getUserPrediction(uint256 _eventId, address _user)
+        external
+        view
+        eventExists(_eventId)
+        returns (bool hasPredicted, uint256 timestamp, bool isRevealed)
+    {
+        ConfidentialPrediction memory prediction = predictions[_eventId][_user];
+        return (prediction.hasPredicted, prediction.timestamp, prediction.isRevealed);
+    }
+    
+    // Get total number of events
+    function getTotalEvents() external view returns (uint256) {
+        return totalEvents;
+    }
+    
+    // Get event predictors
+    function getEventPredictors(uint256 _eventId) external view eventExists(_eventId) returns (address[] memory) {
+        return events[_eventId].predictors;
+    }
+    
+    // Get prediction statistics
+    function getPredictionStats(uint256 _eventId)
+        external
+        view
+        eventExists(_eventId)
+        returns (uint256 totalPredictions, bool isFinalized, bool isActive)
+    {
+        PredictionEvent memory eventData = events[_eventId];
+        return (eventData.totalPredictions, eventData.isFinalized, eventData.isActive);
+    }
+    
+    // Pause/unpause an event (only owner)
+    function pauseEvent(uint256 _eventId) external onlyOwner eventExists(_eventId) {
+        events[_eventId].isActive = false;
+    }
+
+    function resumeEvent(uint256 _eventId) external onlyOwner eventExists(_eventId) {
+        require(!events[_eventId].isFinalized, "Cannot resume finalized event");
+        require(block.timestamp < events[_eventId].endTime, "Event has ended");
+        events[_eventId].isActive = true;
+    }
+
+    // Check if prediction time is active for an event
+    function isPredictionTimeActive(uint256 _eventId) external view eventExists(_eventId) returns (bool) {
+        PredictionEvent memory eventData = events[_eventId];
+        return eventData.isActive && !eventData.isFinalized && block.timestamp < eventData.endTime;
+    }
+}

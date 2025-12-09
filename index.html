@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Prediction Platform</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.umd.min.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00d2ff 0%, #3a47d5 50%, #ff006e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header h1 {
+            text-align: center;
+            color: #4a5568;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            text-align: center;
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+        }
+
+        .status {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .wallet-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .quick-event-card {
+            background: linear-gradient(135deg, #00d2ff 0%, #3a47d5 50%, #ff006e 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .quick-event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .quick-event-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .quick-event-card p {
+            margin: 0 0 15px 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .quick-prediction-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .quick-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .quick-btn.yes {
+            background: rgba(72, 187, 120, 0.8);
+            border-color: rgba(72, 187, 120, 1);
+        }
+
+        .quick-btn.no {
+            background: rgba(245, 101, 101, 0.8);
+            border-color: rgba(245, 101, 101, 1);
+        }
+
+        .quick-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .demo-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-card::before {
+            content: "DEMO";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .demo-card .quick-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-color: #ff6b6b;
+            font-weight: bold;
+            animation: pulse-deploy 2s infinite;
+        }
+
+        .demo-card .quick-btn:hover {
+            background: linear-gradient(45deg, #ff5252, #d63031);
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        @keyframes pulse-deploy {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+        }
+
+        .prediction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .prediction-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prediction-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .prediction-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .prediction-card h3 {
+            font-size: 1.4em;
+            margin: 0 0 15px 0;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .prediction-card p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+            font-size: 0.95em;
+        }
+
+        .quick-prediction-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .quick-btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-btn.yes {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .quick-btn.yes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        .quick-btn.no {
+            background: linear-gradient(45deg, #f56565, #e53e3e);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .quick-btn.no:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 101, 101, 0.4);
+        }
+
+        .prediction-subtitle {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin: 10px 0 20px 0;
+            display: inline-block;
+        }
+
+        .prediction-info {
+            background: rgba(118, 75, 162, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 15px;
+            border-left: 3px solid #764ba2;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .prediction-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .prediction-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Privacy Prediction Platform</h1>
+            <p>Make confidential predictions using blockchain technology</p>
+        </div>
+
+        <div id="statusMessage" class="status hidden"></div>
+
+        <!-- Wallet Connection -->
+        <div class="card">
+            <h2>💰 Wallet Connection</h2>
+            <div id="walletSection">
+                <button id="connectWallet" class="btn">Connect MetaMask Wallet</button>
+                <div id="walletInfo" class="hidden">
+                    <div class="wallet-info">
+                        <span><strong>Address:</strong> <span id="walletAddress"></span></span>
+                        <span><strong>Network:</strong> <span id="networkName">Sepolia</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contract Status -->
+        <div class="card">
+            <h2>📊 Contract Status</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalEvents">0</div>
+                    <div>Total Events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="contractStatus">Checking...</div>
+                    <div>Contract Status</div>
+                </div>
+            </div>
+            <p><strong>Contract Address:</strong> 0x86EB37C3DC77925812451258e4a7fb63092BB60B</p>
+        </div>
+
+
+        <!-- Quick Prediction Section -->
+        <div id="quickPredictionSection" class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); border: none; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="font-size: 2.2em; background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;">⚡ Privacy Prediction Games</h2>
+                <p style="color: #666; font-size: 1.1em; max-width: 600px; margin: 0 auto;">Make confidential predictions on trending events using blockchain technology. Your predictions are encrypted until results are revealed!</p>
+            </div>
+
+            <div id="quickPredictionEvents" class="prediction-grid">
+                <!-- Quick prediction cards will be inserted here -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const CONTRACT_ADDRESS = "0x86EB37C3DC77925812451258e4a7fb63092BB60B";
+        const SEPOLIA_CHAIN_ID = "0xaa36a7";
+        const SEPOLIA_RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
+
+        const CONTRACT_ABI = [
+            "function owner() view returns (address)",
+            "function getTotalEvents() view returns (uint256)",
+            "function createEvent(string title, string description, uint256 duration) returns (uint256)",
+            "function makePrediction(uint256 eventId, bool prediction)",
+            "function finalizeEvent(uint256 eventId, bool actualOutcome)",
+            "function getEvent(uint256 eventId) view returns (tuple(string title, string description, uint256 endTime, bool isFinalized, bool actualOutcome, uint256 totalPredictions, address creator, bool isActive, address[] predictors))",
+            "function getUserPrediction(uint256 eventId, address user) view returns (bool hasPredicted, uint256 timestamp, bool isRevealed)",
+            "function isPredictionTimeActive(uint256 eventId) view returns (bool)",
+            "event EventCreated(uint256 indexed eventId, string title, uint256 endTime, address indexed creator)",
+            "event PredictionMade(uint256 indexed eventId, address indexed predictor, uint256 timestamp)",
+            "event EventFinalized(uint256 indexed eventId, bool outcome, uint256 totalPredictions)"
+        ];
+
+        let provider, signer, contract, userAddress, isOwner = false;
+
+        // DOM elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const walletInfo = document.getElementById('walletInfo');
+        const walletAddress = document.getElementById('walletAddress');
+        const statusMessage = document.getElementById('statusMessage');
+        const ownerSection = document.getElementById('ownerSection');
+        const finalizeSection = document.getElementById('finalizeSection');
+        const totalEventsSpan = document.getElementById('totalEvents');
+        const contractStatus = document.getElementById('contractStatus');
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status ${type}`;
+            statusMessage.classList.remove('hidden');
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    showStatus('Please install MetaMask!', 'error');
+                    return;
+                }
+
+                const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
+                const chainId = await window.ethereum.request({method: 'eth_chainId'});
+
+                if (chainId !== SEPOLIA_CHAIN_ID) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: SEPOLIA_CHAIN_ID }],
+                        });
+                    } catch (error) {
+                        showStatus('Please switch to Sepolia testnet', 'error');
+                        return;
+                    }
+                }
+
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                userAddress = accounts[0];
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                walletAddress.textContent = `${userAddress.substring(0, 6)}...${userAddress.substring(38)}`;
+                connectWalletBtn.classList.add('hidden');
+                walletInfo.classList.remove('hidden');
+
+                await checkOwnerStatus();
+                await updateContractStatus();
+                await loadEventOptions();
+
+                showStatus('✅ Wallet connected successfully!', 'success');
+
+            } catch (error) {
+                showStatus('Failed to connect wallet: ' + error.message, 'error');
+            }
+        }
+
+        async function checkOwnerStatus() {
+            try {
+                const owner = await contract.owner();
+                isOwner = userAddress.toLowerCase() === owner.toLowerCase();
+
+                if (isOwner) {
+                    ownerSection.classList.remove('hidden');
+                    finalizeSection.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Failed to check owner status:', error);
+            }
+        }
+
+        async function updateContractStatus() {
+            try {
+                if (!contract) {
+                    contractStatus.textContent = 'Not Connected';
+                    totalEventsSpan.textContent = '0';
+                    return;
+                }
+
+                const total = await contract.getTotalEvents();
+                totalEventsSpan.textContent = total.toString();
+                contractStatus.textContent = total > 0 ? 'Active' : 'No Events';
+            } catch (error) {
+                contractStatus.textContent = 'Error';
+                totalEventsSpan.textContent = '0';
+                console.error('Failed to get contract status:', error);
+            }
+        }
+
+        async function loadEventOptions() {
+            try {
+                if (!contract) {
+                    return;
+                }
+
+                const total = await contract.getTotalEvents();
+                const predictionSelect = document.getElementById('predictionEventId');
+                const finalizeSelect = document.getElementById('finalizeEventId');
+
+                predictionSelect.innerHTML = '<option value="">Select an event to predict</option>';
+                finalizeSelect.innerHTML = '<option value="">Select an event</option>';
+
+                for (let i = 0; i < total; i++) {
+                    try {
+                        const event = await contract.getEvent(i);
+                        const title = event[0];
+                        const isFinalized = event[3];
+                        const isActive = await contract.isPredictionTimeActive(i);
+
+                        // Check if user has already made a prediction for this event
+                        let userHasPredicted = false;
+                        if (userAddress) {
+                            try {
+                                const userPrediction = await contract.getUserPrediction(i, userAddress);
+                                userHasPredicted = userPrediction[0]; // hasPredicted
+                            } catch (error) {
+                                console.log(`Could not check user prediction for event ${i}`);
+                            }
+                        }
+
+                        // Add to prediction dropdown if active and user hasn't predicted yet
+                        if (isActive) {
+                            const option = document.createElement('option');
+                            option.value = i;
+                            if (userHasPredicted) {
+                                option.textContent = `Event ${i}: ${title} ✅ (Already Predicted)`;
+                                option.disabled = true;
+                            } else {
+                                option.textContent = `Event ${i}: ${title}`;
+                            }
+                            predictionSelect.appendChild(option);
+                        }
+
+                        // Add to finalize dropdown if ended but not finalized (for owner)
+                        if (!isFinalized && !isActive && isOwner) {
+                            const option = document.createElement('option');
+                            option.value = i;
+                            option.textContent = `Event ${i}: ${title}`;
+                            finalizeSelect.appendChild(option);
+                        }
+                    } catch (error) {
+                        console.error(`Error loading event ${i}:`, error);
+                    }
+                }
+
+                // Update prediction dropdown message based on available options
+                if (predictionSelect.children.length === 1) {
+                    predictionSelect.innerHTML = '<option value="">No available events to predict</option>';
+                }
+
+                // Load user prediction history
+                if (userAddress) {
+                    await loadUserPredictions();
+                }
+
+                // Load quick predictions
+                await loadQuickPredictions();
+
+            } catch (error) {
+                console.error('Failed to load event options:', error);
+            }
+        }
+
+        async function loadQuickPredictions() {
+            try {
+                const quickEventsContainer = document.getElementById('quickPredictionEvents');
+
+                // Show demo events if no contract or no events
+                if (!contract) {
+                    showDemoQuickPredictions();
+                    return;
+                }
+
+                const total = await contract.getTotalEvents();
+
+                if (total == 0) {
+                    showDemoQuickPredictions();
+                    return;
+                }
+
+                let quickEventsHTML = '';
+                let activeEventsCount = 0;
+
+                for (let i = 0; i < Math.min(Number(total), 6); i++) { // Show max 6 events
+                    try {
+                        const event = await contract.getEvent(i);
+                        const title = event[0];
+                        const description = event[1];
+                        const isFinalized = event[3];
+                        const isActive = await contract.isPredictionTimeActive(i);
+
+                        if (!isActive || isFinalized) continue;
+
+                        // Check if user has already predicted
+                        let userHasPredicted = false;
+                        if (userAddress) {
+                            try {
+                                const userPrediction = await contract.getUserPrediction(i, userAddress);
+                                userHasPredicted = userPrediction[0];
+                            } catch (error) {
+                                console.log(`Could not check user prediction for event ${i}`);
+                            }
+                        }
+
+                        activeEventsCount++;
+
+                        quickEventsHTML += `
+                            <div class="quick-event-card">
+                                <h3>${title}</h3>
+                                <p>${description.length > 60 ? description.substring(0, 60) + '...' : description}</p>
+                                <div class="quick-prediction-buttons">
+                                    <button class="quick-btn yes"
+                                            onclick="quickPredict(${i}, true)"
+                                            ${userHasPredicted || !userAddress ? 'disabled' : ''}>
+                                        ${userHasPredicted ? '✅ Predicted' : '👍 YES'}
+                                    </button>
+                                    <button class="quick-btn no"
+                                            onclick="quickPredict(${i}, false)"
+                                            ${userHasPredicted || !userAddress ? 'disabled' : ''}>
+                                        ${userHasPredicted ? '✅ Predicted' : '👎 NO'}
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } catch (error) {
+                        console.error(`Error loading quick event ${i}:`, error);
+                    }
+                }
+
+                if (activeEventsCount === 0) {
+                    showDemoQuickPredictions();
+                } else {
+                    quickEventsContainer.innerHTML = quickEventsHTML;
+                }
+
+            } catch (error) {
+                console.error('Failed to load quick predictions:', error);
+                showDemoQuickPredictions();
+            }
+        }
+
+        function showDemoQuickPredictions() {
+            console.log('🔧 showDemoQuickPredictions called');
+            const quickEventsContainer = document.getElementById('quickPredictionEvents');
+            console.log('📦 quickEventsContainer:', quickEventsContainer);
+
+            const demoEvents = [
+                {
+                    title: "🏆 2026 FIFA World Cup Winner",
+                    description: "Will Brazil win the 2026 FIFA World Cup? Make your prediction now!",
+                    icon: "⚽",
+                    subtitle: "Brazil vs Others"
+                },
+                {
+                    title: "💎 Bitcoin $100K Breakthrough",
+                    description: "Will Bitcoin reach $100,000 by end of 2024? Predict the future!",
+                    icon: "₿",
+                    subtitle: "Break $100K vs Won't Break"
+                },
+                {
+                    title: "🎮 Gaming Championship 2026",
+                    description: "Predict the League of Legends World Championship winner!",
+                    icon: "🏅",
+                    subtitle: "Korea vs Other Regions"
+                }
+            ];
+
+            let demoHTML = '';
+            demoEvents.forEach((event, index) => {
+                demoHTML += `
+                    <div class="prediction-card" data-event-id="${index}">
+                        <h3>${event.icon} ${event.title}</h3>
+                        <p>${event.description}</p>
+                        <div class="prediction-subtitle">${event.subtitle}</div>
+                        <div class="quick-prediction-buttons">
+                            <button class="quick-btn yes" onclick="makeDemoPrediction(${index}, true)">
+                                👍 YES
+                            </button>
+                            <button class="quick-btn no" onclick="makeDemoPrediction(${index}, false)">
+                                👎 NO
+                            </button>
+                        </div>
+                        <div class="prediction-info">
+                            🔒 Click to make confidential prediction with MetaMask
+                        </div>
+                    </div>
+                `;
+            });
+
+            quickEventsContainer.innerHTML = demoHTML;
+            console.log('✅ Demo HTML inserted:', demoHTML.length, 'characters');
+        }
+
+        function testDemoFunction() {
+            console.log('🧪 Test button clicked!');
+            console.log('🔍 Testing makeDemoPrediction directly...');
+            makeDemoPrediction(0, true);
+        }
+
+        async function makeDemoPrediction(demoIndex, prediction) {
+            console.log('🔥 makeDemoPrediction called with:', { demoIndex, prediction });
+            console.log('🔍 Checking userAddress:', userAddress);
+            console.log('🔍 Checking contract:', contract);
+
+            if (!userAddress) {
+                console.log('❌ No userAddress, showing connect wallet message');
+                showStatus('Please connect your wallet first!', 'error');
+                return;
+            }
+
+            if (!contract) {
+                console.log('❌ No contract, showing contract not loaded message');
+                showStatus('Contract not loaded. Please refresh the page.', 'error');
+                return;
+            }
+
+            console.log('✅ Wallet and contract checks passed');
+
+            const demoEventNames = [
+                "FIFA World Cup 2026",
+                "Bitcoin $100K",
+                "Gaming Championship 2026"
+            ];
+
+            const eventName = demoEventNames[demoIndex] || `Event ${demoIndex}`;
+            const predictionText = prediction ? 'YES' : 'NO';
+
+            try {
+                console.log('🚀 Starting transaction process...');
+
+                // Try to find an event that user hasn't predicted on yet
+                let eventId = null;
+                const totalEvents = await contract.getTotalEvents();
+                console.log('📊 Total events available:', totalEvents.toString());
+
+                for (let i = 0; i < totalEvents; i++) {
+                    try {
+                        console.log(`🔍 Checking event ${i} for existing prediction...`);
+                        const userPrediction = await contract.getUserPrediction(i, userAddress);
+                        console.log(`📊 Event ${i} prediction result:`, userPrediction);
+
+                        if (!userPrediction[0]) { // User hasn't predicted on this event
+                            eventId = i;
+                            console.log(`✅ Found available event: ${eventId}`);
+                            break;
+                        } else {
+                            console.log(`⚠️ User already predicted on event ${i}`);
+                        }
+                    } catch (error) {
+                        console.log(`⚠️ Could not check event ${i}:`, error.message);
+                        // If we can't check, assume it's available
+                        eventId = i;
+                        break;
+                    }
+                }
+
+                if (eventId === null) {
+                    console.log('❌ No available events found');
+                    showStatus(`❌ You have already made predictions on all available events!`, 'error');
+                    return;
+                }
+
+                console.log('📝 Using eventId:', eventId);
+
+                console.log('📢 Showing status message...');
+                showStatus(`🔄 Submitting ${predictionText} prediction for ${eventName}...`, 'info');
+
+                console.log('🔗 Calling contract.makePrediction...');
+
+                const tx = await contract.makePrediction(eventId, prediction);
+                showStatus(`⏳ Transaction sent! Waiting for confirmation...`, 'info');
+
+                const receipt = await tx.wait();
+                showStatus(`✅ ${predictionText} prediction for ${eventName} confirmed! Gas: ${receipt.gasUsed.toString()}`, 'success');
+
+                // Refresh the UI
+                await updateContractStatus();
+                await loadEventOptions();
+                await loadQuickPredictions();
+
+            } catch (error) {
+                console.error('Demo prediction failed:', error);
+
+                if (error.code === 4001) {
+                    showStatus('❌ Transaction rejected by user', 'error');
+                } else if (error.message.includes('Event does not exist')) {
+                    showStatus('❌ No events available. Please ask the contract owner to create events first.', 'error');
+                } else if (error.message.includes('Already made prediction')) {
+                    showStatus('❌ You have already made a prediction for this event!', 'error');
+                } else if (error.message.includes('Event has ended')) {
+                    showStatus('❌ This prediction event has ended.', 'error');
+                } else if (error.message.includes('insufficient funds')) {
+                    showStatus('❌ Insufficient ETH for gas fees', 'error');
+                } else {
+                    showStatus(`❌ Prediction failed: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function quickPredict(eventId, prediction) {
+            if (!userAddress) {
+                showStatus('Please connect your wallet first!', 'error');
+                return;
+            }
+
+            try {
+                // Check if user has already made a prediction
+                const userPrediction = await contract.getUserPrediction(eventId, userAddress);
+                if (userPrediction[0]) {
+                    showStatus('❌ You have already made a prediction for this event!', 'error');
+                    return;
+                }
+
+                const tx = await contract.makePrediction(eventId, prediction);
+
+                showStatus('⚡ Quick prediction submitting...', 'info');
+                const receipt = await tx.wait();
+
+                const predictionText = prediction ? 'YES' : 'NO';
+                showStatus(`✅ Quick prediction "${predictionText}" submitted successfully!`, 'success');
+
+                // Refresh the UI
+                await updateContractStatus();
+                await loadEventOptions();
+
+            } catch (error) {
+                showStatus('Quick prediction failed: ' + error.message, 'error');
+            }
+        }
+
+        async function deployDemoEvent(demoId, prediction) {
+            if (!userAddress) {
+                showStatus('Please connect your wallet first!', 'error');
+                return;
+            }
+
+            if (!contract) {
+                showStatus('Contract not connected!', 'error');
+                return;
+            }
+
+            const demoEvents = [
+                {
+                    title: "🏆 2026 FIFA World Cup Winner Prediction",
+                    description: "Will Brazil win the 2026 FIFA World Cup? Your prediction will be encrypted and protected until the tournament ends.",
+                    duration: 90 * 24 * 60 * 60, // 90 days
+                    name: "FIFA World Cup"
+                },
+                {
+                    title: "💎 Bitcoin $100K Breakthrough Prediction",
+                    description: "Will Bitcoin break through $100,000 by the end of 2024? Use encryption technology to protect your prediction.",
+                    duration: 60 * 24 * 60 * 60, // 60 days
+                    name: "Bitcoin $100K"
+                },
+                {
+                    title: "🎮 Gaming Championship 2026 Prediction",
+                    description: "Predict the outcome of major esports and gaming championships. Your predictions are secured with cryptographic technology.",
+                    duration: 30 * 24 * 60 * 60, // 30 days
+                    name: "Gaming Championship 2026"
+                }
+            ];
+
+            const event = demoEvents[demoId];
+            const predictionText = prediction ? 'YES' : 'NO';
+
+            try {
+                // Check if user is owner to create events
+                const owner = await contract.owner();
+                const isUserOwner = userAddress.toLowerCase() === owner.toLowerCase();
+
+                showStatus(`🚀 Deploying "${event.name}" to blockchain...`, 'info');
+
+                if (isUserOwner) {
+                    // Deploy the event first
+                    const createTx = await contract.createEvent(event.title, event.description, event.duration);
+                    showStatus('⏳ Creating event on blockchain...', 'info');
+                    const createReceipt = await createTx.wait();
+
+                    showStatus(`✅ Event created! Now making your ${predictionText} prediction...`, 'info');
+
+                    // Get the new event ID (should be the latest)
+                    const totalEvents = await contract.getTotalEvents();
+                    const newEventId = totalEvents - 1;
+
+                    // Make the prediction
+                    const predictTx = await contract.makePrediction(newEventId, prediction);
+                    showStatus('⏳ Recording your prediction...', 'info');
+                    const predictReceipt = await predictTx.wait();
+
+                    showStatus(`🎉 Success! "${event.name}" deployed and your "${predictionText}" prediction recorded!`, 'success');
+                } else {
+                    // If not owner, just try to make prediction on existing events
+                    const totalEvents = await contract.getTotalEvents();
+                    if (totalEvents > demoId) {
+                        const predictTx = await contract.makePrediction(demoId, prediction);
+                        showStatus('⏳ Recording your prediction...', 'info');
+                        const predictReceipt = await predictTx.wait();
+
+                        showStatus(`✅ Your "${predictionText}" prediction recorded on existing event!`, 'success');
+                    } else {
+                        showStatus('❌ Only contract owner can create new events. Please contact admin to create events first.', 'error');
+                        return;
+                    }
+                }
+
+                // Refresh the UI
+                await updateContractStatus();
+                await loadEventOptions();
+
+            } catch (error) {
+                console.error('Deploy demo event failed:', error);
+
+                if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
+                    showStatus('❌ Transaction rejected by user', 'error');
+                } else if (error.message.includes('Only authorized')) {
+                    showStatus('❌ Only contract owner can create events', 'error');
+                } else {
+                    showStatus(`❌ Deployment failed: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function deployAllDemoEvents() {
+            if (!userAddress) {
+                showStatus('Please connect your wallet first!', 'error');
+                return;
+            }
+
+            if (!contract) {
+                showStatus('Contract not connected!', 'error');
+                return;
+            }
+
+            try {
+                // Check if user is owner
+                const owner = await contract.owner();
+                const isUserOwner = userAddress.toLowerCase() === owner.toLowerCase();
+
+                if (!isUserOwner) {
+                    showStatus('❌ Only contract owner can create events', 'error');
+                    return;
+                }
+
+                const demoEvents = [
+                    {
+                        title: "🏆 2026 FIFA World Cup Winner Prediction",
+                        description: "Will Brazil win the 2026 FIFA World Cup? Your prediction will be encrypted and protected until the tournament ends.",
+                        duration: 90 * 24 * 60 * 60
+                    },
+                    {
+                        title: "💎 Bitcoin $100K Breakthrough Prediction",
+                        description: "Will Bitcoin break through $100,000 by the end of 2024? Use encryption technology to protect your prediction.",
+                        duration: 60 * 24 * 60 * 60
+                    },
+                    {
+                        title: "🎮 Gaming Championship 2026 Prediction",
+                        description: "Predict the outcome of major esports and gaming championships. Your predictions are secured with cryptographic technology.",
+                        duration: 30 * 24 * 60 * 60
+                    }
+                ];
+
+                showStatus('🚀 Deploying all 3 demo events to blockchain...', 'info');
+
+                for (let i = 0; i < demoEvents.length; i++) {
+                    const event = demoEvents[i];
+
+                    showStatus(`⏳ Creating event ${i + 1}/3: ${event.title.split(' ')[1]} ${event.title.split(' ')[2]}...`, 'info');
+
+                    const tx = await contract.createEvent(event.title, event.description, event.duration);
+                    await tx.wait();
+
+                    showStatus(`✅ Event ${i + 1}/3 created successfully!`, 'info');
+                }
+
+                showStatus('🎉 All 3 demo events deployed successfully! Users can now make predictions!', 'success');
+
+                // Refresh the UI
+                await updateContractStatus();
+                await loadEventOptions();
+
+            } catch (error) {
+                console.error('Deploy all demo events failed:', error);
+
+                if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
+                    showStatus('❌ Transaction rejected by user', 'error');
+                } else {
+                    showStatus(`❌ Deployment failed: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function loadUserPredictions() {
+            try {
+                const total = await contract.getTotalEvents();
+                const predictionHistory = document.getElementById('predictionHistory');
+                const userPredictionsDiv = document.getElementById('userPredictions');
+
+                let userPredictions = [];
+
+                for (let i = 0; i < total; i++) {
+                    try {
+                        const userPrediction = await contract.getUserPrediction(i, userAddress);
+                        if (userPrediction[0]) { // hasPredicted
+                            const event = await contract.getEvent(i);
+                            userPredictions.push({
+                                eventId: i,
+                                title: event[0],
+                                isFinalized: event[3],
+                                timestamp: userPrediction[1],
+                                isRevealed: userPrediction[2]
+                            });
+                        }
+                    } catch (error) {
+                        console.log(`Could not check prediction for event ${i}`);
+                    }
+                }
+
+                if (userPredictions.length > 0) {
+                    userPredictionsDiv.classList.remove('hidden');
+
+                    let historyHTML = '';
+                    userPredictions.forEach(pred => {
+                        const date = new Date(Number(pred.timestamp) * 1000).toLocaleString();
+                        const status = pred.isFinalized ? '🏁 Finalized' : '⏳ Pending';
+
+                        historyHTML += `
+                            <div style="background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 4px solid #667eea;">
+                                <strong>Event ${pred.eventId}:</strong> ${pred.title}<br>
+                                <small>📅 Predicted: ${date} | ${status}</small>
+                            </div>
+                        `;
+                    });
+
+                    predictionHistory.innerHTML = historyHTML;
+                } else {
+                    userPredictionsDiv.classList.add('hidden');
+                }
+
+            } catch (error) {
+                console.error('Failed to load user predictions:', error);
+            }
+        }
+
+        async function createEvent() {
+            const title = document.getElementById('eventTitle').value;
+            const description = document.getElementById('eventDescription').value;
+            const duration = document.getElementById('eventDuration').value;
+
+            if (!title || !description || !duration) {
+                showStatus('Please fill in all fields!', 'error');
+                return;
+            }
+
+            try {
+                const durationInSeconds = parseInt(duration) * 60 * 60;
+                const tx = await contract.createEvent(title, description, durationInSeconds);
+
+                showStatus('Creating event...', 'info');
+                const receipt = await tx.wait();
+
+                showStatus(`✅ Event created successfully! Block: ${receipt.blockNumber}`, 'success');
+
+                // Clear form
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventDescription').value = '';
+                document.getElementById('eventDuration').value = '168';
+
+                await updateContractStatus();
+                await loadEventOptions();
+
+            } catch (error) {
+                showStatus('Failed to create event: ' + error.message, 'error');
+            }
+        }
+
+        async function createDefaultEvents() {
+            const defaultEvents = [
+                {
+                    title: "🏆 2026 FIFA World Cup Winner Prediction",
+                    description: "Predict which team will win the 2026 FIFA World Cup!",
+                    duration: 90 * 24 * 60 * 60
+                },
+                {
+                    title: "💎 Bitcoin $100K Breakthrough Prediction",
+                    description: "Will Bitcoin break through $100,000 by the end of 2024?",
+                    duration: 60 * 24 * 60 * 60
+                },
+                {
+                    title: "🎮 Gaming Championship Prediction",
+                    description: "Predict the outcome of major esports championships.",
+                    duration: 30 * 24 * 60 * 60
+                }
+            ];
+
+            try {
+                showStatus('Creating default events...', 'info');
+
+                for (let i = 0; i < defaultEvents.length; i++) {
+                    const event = defaultEvents[i];
+                    const tx = await contract.createEvent(event.title, event.description, event.duration);
+                    await tx.wait();
+                }
+
+                showStatus('✅ All default events created successfully!', 'success');
+                await updateContractStatus();
+                await loadEventOptions();
+
+            } catch (error) {
+                showStatus('Failed to create default events: ' + error.message, 'error');
+            }
+        }
+
+        async function makePrediction() {
+            const eventId = document.getElementById('predictionEventId').value;
+            const prediction = document.getElementById('predictionValue').value === 'true';
+
+            if (!eventId) {
+                showStatus('Please select an event!', 'error');
+                return;
+            }
+
+            try {
+                // Check if user has already made a prediction
+                const userPrediction = await contract.getUserPrediction(parseInt(eventId), userAddress);
+                if (userPrediction[0]) { // hasPredicted
+                    showStatus('❌ You have already made a prediction for this event!', 'error');
+                    return;
+                }
+
+                const tx = await contract.makePrediction(parseInt(eventId), prediction);
+
+                showStatus('Submitting prediction...', 'info');
+                const receipt = await tx.wait();
+
+                const predictionText = prediction ? 'YES' : 'NO';
+                showStatus(`✅ Prediction "${predictionText}" submitted successfully! Gas: ${receipt.gasUsed.toString()}`, 'success');
+
+                // Reset the form
+                document.getElementById('predictionEventId').value = '';
+                document.getElementById('predictionValue').value = 'true';
+
+                // Refresh the UI after successful prediction
+                await updateContractStatus();
+                await loadEventOptions();
+
+            } catch (error) {
+                showStatus('Failed to make prediction: ' + error.message, 'error');
+            }
+        }
+
+        async function finalizeEvent() {
+            const eventId = document.getElementById('finalizeEventId').value;
+            const outcome = document.getElementById('actualOutcome').value === 'true';
+
+            if (!eventId) {
+                showStatus('Please select an event!', 'error');
+                return;
+            }
+
+            try {
+                const tx = await contract.finalizeEvent(parseInt(eventId), outcome);
+
+                showStatus('Finalizing event...', 'info');
+                const receipt = await tx.wait();
+
+                showStatus(`✅ Event finalized successfully! Block: ${receipt.blockNumber}`, 'success');
+                await loadEventOptions();
+
+            } catch (error) {
+                showStatus('Failed to finalize event: ' + error.message, 'error');
+            }
+        }
+
+        // Event listeners
+        connectWalletBtn.addEventListener('click', connectWallet);
+
+        // Initialize
+        console.log('🚀 Page initializing...');
+        updateContractStatus();
+
+        // Always show demo predictions first
+        console.log('📢 Calling showDemoQuickPredictions...');
+        showDemoQuickPredictions();
+
+        // Then try to load real predictions if contract is available
+        console.log('🔄 Calling loadQuickPredictions...');
+        loadQuickPredictions();
+    </script>
+</body>
+</html>
