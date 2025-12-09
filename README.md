@@ -435,7 +435,7 @@ npx hardhat verify --network sepolia <CONTRACT_ADDRESS>
 
 ## 🎬 Demo Video
 
-**PrivacyGuess.mp4** - 1-minute demonstration showcasing:
+**PRIVACY PREDICTION PLATFORM.mp4** - 1-minute demonstration showcasing:
 - Platform overview and features
 - Creating prediction events
 - Making encrypted predictions
