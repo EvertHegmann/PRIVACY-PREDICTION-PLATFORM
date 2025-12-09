@@ -4,6 +4,10 @@
 
 A comprehensive, production-ready FHEVM (Fully Homomorphic Encryption Virtual Machine) example hub demonstrating privacy-preserving prediction markets. This project includes automated scaffolding tools, extensive test coverage, and auto-generated documentation for building confidential smart contracts.
 
+[Live](https://privacy-predictionplatform.vercel.app/)
+
+[PRIVACY PREDICTION PLATFORM.mp4](https://streamable.com/3q5kyj)
+
 ## 🎯 Project Overview
 
 This repository serves as a complete FHEVM example hub showcasing:
