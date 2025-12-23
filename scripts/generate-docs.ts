@@ -55,6 +55,81 @@ interface GenerateDocsOptions {
 
 // Example configurations
 const EXAMPLES_CONFIG: Record<string, DocsConfig> = {
+  // Basic Examples
+  'fhe-counter': {
+    title: 'FHE Counter',
+    description: 'This example demonstrates how to build a confidential counter using FHEVM, in comparison to a simple counter.',
+    contract: 'contracts/FHECounter.sol',
+    test: 'test/Counter.ts',
+    output: 'docs/fhe-counter.md',
+    category: 'Basic',
+  },
+  'counter-comparison': {
+    title: 'Counter Comparison: Simple vs FHE',
+    description: 'Side-by-side comparison of a regular counter and FHE counter to understand encryption benefits and trade-offs.',
+    contract: 'contracts/Counter.sol',
+    test: 'test/Counter.ts',
+    output: 'docs/counter-comparison.md',
+    category: 'Basic',
+  },
+
+  // Encryption
+  'encryption-single': {
+    title: 'Encrypt Single Value',
+    description: 'Demonstrates how to encrypt a single value with input proofs and proper validation.',
+    contract: 'contracts/EncryptionExample.sol',
+    test: 'test/FHEExamples.ts',
+    output: 'docs/encryption-single.md',
+    category: 'Encryption',
+  },
+  'encryption-multiple': {
+    title: 'Encrypt Multiple Values',
+    description: 'Shows batch encryption patterns for multiple values with different data types.',
+    contract: 'contracts/EncryptionExample.sol',
+    test: 'test/FHEExamples.ts',
+    output: 'docs/encryption-multiple.md',
+    category: 'Encryption',
+  },
+
+  // Decryption
+  'decryption-user': {
+    title: 'User Decrypt Single Value',
+    description: 'Demonstrates user-only decryption patterns where only the data owner can decrypt their encrypted data.',
+    contract: 'contracts/DecryptionExample.sol',
+    test: 'test/FHEExamples.ts',
+    output: 'docs/decryption-user.md',
+    category: 'Decryption',
+  },
+  'decryption-public': {
+    title: 'Public Decrypt Single Value',
+    description: 'Shows public decryption with oracle patterns for transparent reveals after specific events.',
+    contract: 'contracts/DecryptionExample.sol',
+    test: 'test/FHEExamples.ts',
+    output: 'docs/decryption-public.md',
+    category: 'Decryption',
+  },
+
+  // Access Control
+  'access-control': {
+    title: 'Access Control',
+    description: 'Demonstrates FHE.allow and FHE.allowThis patterns for managing permissions on encrypted data.',
+    contract: 'contracts/AccessControlExample.sol',
+    test: 'test/FHEExamples.ts',
+    output: 'docs/access-control.md',
+    category: 'Access Control',
+  },
+
+  // Anti-Patterns
+  'anti-patterns': {
+    title: 'Anti-Patterns and Best Practices',
+    description: 'Educational examples showing common mistakes with FHE and the correct alternatives for each pattern.',
+    contract: 'contracts/AntiPatterns.sol',
+    test: 'test/FHEExamples.ts',
+    output: 'docs/anti-patterns.md',
+    category: 'Best Practices',
+  },
+
+  // Advanced Examples
   'privacy-prediction-basic': {
     title: 'Privacy Prediction Platform - Basic',
     description: 'This example demonstrates how to build a confidential prediction platform using FHEVM, allowing users to make encrypted predictions on future events.',

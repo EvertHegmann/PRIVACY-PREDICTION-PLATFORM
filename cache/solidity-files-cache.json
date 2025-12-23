@@ -1,0 +1,329 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "D:\\\\\\PrivacyPredictionPlatform\\contracts\\AccessControlExample.sol": {
+      "lastModificationDate": 1765947002303,
+      "contentHash": "1db75be6dd6fb494fbaa83960c30ad43",
+      "sourceName": "contracts/AccessControlExample.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 800
+          },
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "AccessControlExample"
+      ]
+    },
+    "D:\\\\\\PrivacyPredictionPlatform\\contracts\\AntiPatterns.sol": {
+      "lastModificationDate": 1765947152268,
+      "contentHash": "8c857603c16534986ec69b1a7d14967f",
+      "sourceName": "contracts/AntiPatterns.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 800
+          },
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "AntiPatterns"
+      ]
+    },
+    "D:\\\\\\PrivacyPredictionPlatform\\contracts\\Counter.sol": {
+      "lastModificationDate": 1765873604055,
+      "contentHash": "274d3a82b5f733e4ebdea1ddce2fc03a",
+      "sourceName": "contracts/Counter.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 800
+          },
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "Counter"
+      ]
+    },
+    "D:\\\\\\PrivacyPredictionPlatform\\contracts\\DecryptionExample.sol": {
+      "lastModificationDate": 1765947088172,
+      "contentHash": "27a1ed0a203318fd845b1ec1f04b8b2b",
+      "sourceName": "contracts/DecryptionExample.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 800
+          },
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "DecryptionExample"
+      ]
+    },
+    "D:\\\\\\PrivacyPredictionPlatform\\contracts\\EncryptionExample.sol": {
+      "lastModificationDate": 1765947042682,
+      "contentHash": "cd5c3b9342ccd9f5cfaa833fcbefede7",
+      "sourceName": "contracts/EncryptionExample.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 800
+          },
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "EncryptionExample"
+      ]
+    },
+    "D:\\\\\\PrivacyPredictionPlatform\\contracts\\FHECounter.sol": {
+      "lastModificationDate": 1765873618590,
+      "contentHash": "e1db0ab59df098355d09829b2df563c2",
+      "sourceName": "contracts/FHECounter.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 800
+          },
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "FHECounter"
+      ]
+    },
+    "D:\\\\\\PrivacyPredictionPlatform\\contracts\\PrivacyGuess.sol": {
+      "lastModificationDate": 1759317961489,
+      "contentHash": "1ddeb0e09f572c4ceeb63b5f973a9cec",
+      "sourceName": "contracts/PrivacyGuess.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 800
+          },
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "PrivacyGuess"
+      ]
+    },
+    "D:\\\\\\PrivacyPredictionPlatform\\contracts\\PrivacyGuessFHESimple.sol": {
+      "lastModificationDate": 1759317961489,
+      "contentHash": "0da58dee2b00df8320e38d8d0dc68936",
+      "sourceName": "contracts/PrivacyGuessFHESimple.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 800
+          },
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "PrivacyGuessFHESimple"
+      ]
+    },
+    "D:\\\\\\PrivacyPredictionPlatform\\contracts\\PrivacyPredictionPlatformSimple.sol": {
+      "lastModificationDate": 1759317961491,
+      "contentHash": "f22f3e2e76c96614cb49f69717a9091f",
+      "sourceName": "contracts/PrivacyPredictionPlatformSimple.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 800
+          },
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "PrivacyPredictionPlatformSimple"
+      ]
+    }
+  }
+}

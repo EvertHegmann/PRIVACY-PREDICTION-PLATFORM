@@ -49,6 +49,65 @@ interface ExampleConfig {
 
 // Map of example names to their contract and test paths
 const EXAMPLES_MAP: Record<string, ExampleConfig> = {
+  // Basic Examples
+  'fhe-counter': {
+    contract: 'contracts/FHECounter.sol',
+    test: 'test/Counter.ts',
+    description: 'Simple FHE counter demonstrating encrypted arithmetic operations (add, subtract, compare)',
+    category: 'Basic - Arithmetic',
+  },
+  'counter-comparison': {
+    contract: 'contracts/Counter.sol',
+    test: 'test/Counter.ts',
+    description: 'Comparison between regular counter and FHE counter to understand encryption benefits',
+    category: 'Basic - Arithmetic',
+  },
+
+  // Encryption Examples
+  'encryption-single': {
+    contract: 'contracts/EncryptionExample.sol',
+    test: 'test/FHEExamples.ts',
+    description: 'Encrypt single values with input proofs and proper validation',
+    category: 'Encryption',
+  },
+  'encryption-multiple': {
+    contract: 'contracts/EncryptionExample.sol',
+    test: 'test/FHEExamples.ts',
+    description: 'Batch encryption of multiple values with different data types',
+    category: 'Encryption',
+  },
+
+  // Decryption Examples
+  'decryption-user': {
+    contract: 'contracts/DecryptionExample.sol',
+    test: 'test/FHEExamples.ts',
+    description: 'User-only decryption patterns for private data access',
+    category: 'Decryption',
+  },
+  'decryption-public': {
+    contract: 'contracts/DecryptionExample.sol',
+    test: 'test/FHEExamples.ts',
+    description: 'Public decryption with oracle patterns for transparent reveals',
+    category: 'Decryption',
+  },
+
+  // Access Control Examples
+  'access-control': {
+    contract: 'contracts/AccessControlExample.sol',
+    test: 'test/FHEExamples.ts',
+    description: 'FHE.allow and FHE.allowThis patterns for permission management',
+    category: 'Access Control',
+  },
+
+  // Anti-Patterns
+  'anti-patterns': {
+    contract: 'contracts/AntiPatterns.sol',
+    test: 'test/FHEExamples.ts',
+    description: 'Common mistakes with FHE and correct alternatives for each',
+    category: 'Best Practices',
+  },
+
+  // Advanced Examples
   'privacy-prediction-basic': {
     contract: 'contracts/PrivacyGuess.sol',
     test: 'test/PrivacyGuess.ts',

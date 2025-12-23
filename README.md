@@ -6,7 +6,7 @@ A comprehensive, production-ready FHEVM (Fully Homomorphic Encryption Virtual Ma
 
 [Live](https://privacy-predictionplatform.vercel.app/)
 
-[PRIVACY PREDICTION PLATFORM.mp4](https://streamable.com/3q5kyj)
+[PRIVACY PREDICTION PLATFORM.mp4](https://youtu.be/9_-gGozShtQ)
 
 ## 🎯 Project Overview
 
@@ -102,7 +102,27 @@ npm run compile
 npm run test
 ```
 
-Available examples:
+Available examples (10 total):
+
+**Basic Examples:**
+- **fhe-counter** - Simple FHE counter with encrypted arithmetic
+- **counter-comparison** - Side-by-side comparison of simple vs FHE counter
+
+**Encryption:**
+- **encryption-single** - Single value encryption with input proofs
+- **encryption-multiple** - Batch encryption of multiple values
+
+**Decryption:**
+- **decryption-user** - User-only decryption patterns
+- **decryption-public** - Public decryption with oracle patterns
+
+**Access Control:**
+- **access-control** - FHE.allow and FHE.allowThis patterns
+
+**Best Practices:**
+- **anti-patterns** - Common mistakes and correct alternatives
+
+**Advanced:**
 - **privacy-prediction-basic** - Commit-reveal prediction platform
 - **privacy-prediction-fhe** - Multi-round FHE-enhanced predictions
 
@@ -125,30 +145,71 @@ npm run generate-all-docs
 ```
 PrivacyPredictionPlatform/
 │
-├── contracts/                        # FHEVM smart contracts
-│   ├── PrivacyGuess.sol              # Basic commit-reveal implementation
-│   └── PrivacyGuessFHESimple.sol     # FHE-enhanced multi-round version
+├── contracts/                        # FHEVM smart contracts (9 total)
+│   ├── Counter.sol                   # Simple counter (baseline)
+│   ├── FHECounter.sol                # FHE counter with encrypted ops
+│   ├── EncryptionExample.sol         # Single/multiple value encryption
+│   ├── DecryptionExample.sol         # User/public decryption patterns
+│   ├── AccessControlExample.sol      # FHE.allow/allowThis patterns
+│   ├── AntiPatterns.sol              # Common mistakes & solutions
+│   ├── PrivacyGuess.sol              # Basic commit-reveal platform
+│   ├── PrivacyGuessFHESimple.sol     # FHE-enhanced multi-round
+│   └── PrivacyPredictionPlatformSimple.sol
 │
-├── test/                             # Comprehensive test suites
-│   ├── PrivacyGuess.ts               # 50+ test cases for basic version
-│   └── PrivacyGuessFHESimple.ts      # 60+ test cases for FHE version
+├── test/                             # Comprehensive test suites (240+ tests)
+│   ├── Counter.ts                    # Counter comparison tests (50+)
+│   ├── FHEExamples.ts                # FHE examples tests (80+)
+│   ├── PrivacyGuess.ts               # Basic platform tests (60+)
+│   └── PrivacyGuessFHESimple.ts      # FHE platform tests (70+)
 │
 ├── scripts/                          # Automation tools (TypeScript)
-│   ├── create-fhevm-example.ts       # Generate standalone repositories
-│   ├── generate-docs.ts              # Auto-generate documentation
+│   ├── create-fhevm-example.ts       # Generate standalone repositories (10 examples)
+│   ├── generate-docs.ts              # Auto-generate documentation (10 configs)
+│   ├── deploy.ts                     # Deployment script
 │   └── README.md                     # Detailed scripts documentation
 │
-├── docs/                             # Auto-generated documentation
+├── docs/                             # Auto-generated documentation (GitBook)
+│   ├── README.md                     # Documentation hub & learning paths
 │   ├── SUMMARY.md                    # GitBook table of contents
-│   ├── privacy-prediction-basic.md   # Basic example guide
-│   └── privacy-prediction-fhe.md     # FHE example guide
+│   ├── fhe-counter.md                # FHE counter guide
+│   ├── counter-comparison.md         # Simple vs FHE comparison
+│   ├── access-control.md             # Permission patterns guide
+│   ├── anti-patterns.md              # Common mistakes & fixes
+│   ├── privacy-prediction-basic.md   # Basic platform guide
+│   └── privacy-prediction-fhe.md     # Advanced FHE guide
 │
 ├── COMPETITION_README.md             # Comprehensive bounty guide
 ├── SUBMISSION_STRUCTURE.md           # Submission overview
+├── DEVELOPER_GUIDE.md                # Developer workflow guide
+├── CONTRIBUTING.md                   # Contribution guidelines
 ├── README.md                         # This file
 ├── package.json                      # Dependencies and scripts
 └── hardhat.config.ts                 # Hardhat configuration
 ```
+
+## 📚 Complete Example Collection
+
+This repository includes **10 comprehensive FHEVM examples** covering all aspects from basic to advanced:
+
+### Basic Level (Start Here)
+1. **FHE Counter** - Learn encrypted arithmetic (add, subtract, compare)
+2. **Counter Comparison** - Understand simple vs FHE differences
+
+### Intermediate Level
+3. **Encryption Example** - Single and batch encryption with input proofs
+4. **Decryption Example** - User and public decryption patterns
+5. **Access Control** - Permission management with FHE.allow/allowThis
+
+### Best Practices
+6. **Anti-Patterns** - 10 common mistakes and correct solutions
+
+### Advanced Level
+7. **Privacy Prediction - Basic** - Commit-reveal prediction platform
+8. **Privacy Prediction - FHE** - Multi-round platform with advanced features
+
+### Additional Examples
+9. **Counter (Simple)** - Baseline comparison contract
+10. **Privacy Prediction Platform Simple** - Alternative implementation
 
 ## 🎓 Key FHEVM Concepts Demonstrated
 
